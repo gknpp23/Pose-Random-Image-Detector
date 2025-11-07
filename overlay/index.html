@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8" />
   <title>Overlay PoseEdit</title>
+=======
+  <meta charset="UTF-8">
+  <title>Overlay PoseAI</title>
+>>>>>>> 2ebf81f (feat(core): implementa base completa do PoseAI com backend, detector e overlay integrados)
   <style>
     body {
       margin: 0;
@@ -18,9 +23,14 @@
       max-height: 80%;
       opacity: 0;
       transition: opacity 0.6s ease-in-out;
+<<<<<<< HEAD
       border-radius: 10px;
       pointer-events: none;
       user-select: none;
+=======
+      border: 3px solid rgba(255, 255, 255, 0.2); /* debug visual */
+      border-radius: 10px;
+>>>>>>> 2ebf81f (feat(core): implementa base completa do PoseAI com backend, detector e overlay integrados)
     }
     img.show {
       opacity: 1;
@@ -28,6 +38,7 @@
   </style>
 </head>
 <body>
+<<<<<<< HEAD
   <img id="meme" src="" alt="meme" />
   <script src="config.js"></script>
   <script>
@@ -56,6 +67,35 @@
     };
 
     socket.onerror = (err) => console.error("⚠️ Erro no WebSocket:", err);
+=======
+  <img id="meme" src="" alt="meme">
+  <script>
+    const img = document.getElementById('meme');
+    const socket = new WebSocket("ws://127.0.0.1:8000/ws");
+
+    socket.onopen = () => console.log("🟢 Conectado ao servidor WebSocket");
+    socket.onmessage = event => {
+      const data = JSON.parse(event.data);
+      console.log("📩 Evento recebido:", data);
+
+      const memeUrl = `http://127.0.0.1:8000/${data.meme}?t=${Date.now()}`;
+      img.classList.remove("show"); // oculta imagem anterior
+      img.src = memeUrl;
+
+      img.onload = () => {
+        img.classList.add("show"); // mostra com fade-in
+        console.log("✅ Imagem carregada:", memeUrl);
+
+        // some após 3 segundos
+        setTimeout(() => {
+          img.classList.remove("show");
+          console.log("🕒 Imagem oculta após 3s");
+        }, 3000);
+      };
+    };
+
+    socket.onerror = err => console.error("⚠️ Erro no WebSocket:", err);
+>>>>>>> 2ebf81f (feat(core): implementa base completa do PoseAI com backend, detector e overlay integrados)
     socket.onclose = () => console.log("🔴 Conexão encerrada");
   </script>
 </body>

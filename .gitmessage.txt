@@ -1,0 +1,5 @@
+# Commit message format guide (English only)
+# Example: feat(detector): integrate dotenv and camera configuration
+# Type options: feat, fix, refactor, chore, docs, style, test, ci, build, perf
+#
+# Use English. Keep subject under 72 characters.

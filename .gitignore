@@ -55,6 +55,9 @@ config.json
 
 # Node (caso overlay use dependências JS no futuro)
 node_modules/
+<<<<<<< HEAD
 
 .env
 overlay/config.js
+=======
+>>>>>>> 2ebf81f (feat(core): implementa base completa do PoseAI com backend, detector e overlay integrados)
