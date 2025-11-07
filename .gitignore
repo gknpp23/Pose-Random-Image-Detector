@@ -1,0 +1,57 @@
+# ==========================
+# Python / FastAPI / OpenCV
+# ==========================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs / cache
+*.log
+*.sqlite3
+*.db
+*.pid
+*.csv
+*.json.tmp
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# VSCode / IDE configs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Media / temp files
+*.mp4
+*.avi
+*.mov
+*.png
+*.jpg
+*.jpeg
+
+# Local configuration
+config.json
+.env
+.env.*
+
+# Node (caso overlay use dependências JS no futuro)
+node_modules/
