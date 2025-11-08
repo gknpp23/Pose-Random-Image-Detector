@@ -55,3 +55,6 @@ config.json
 
 # Node (caso overlay use dependências JS no futuro)
 node_modules/
+
+.env
+overlay/config.js

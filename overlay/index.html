@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Overlay PoseAI</title>
+  <meta charset="UTF-8" />
+  <title>Overlay PoseEdit</title>
   <style>
     body {
       margin: 0;
@@ -18,8 +18,9 @@
       max-height: 80%;
       opacity: 0;
       transition: opacity 0.6s ease-in-out;
-      border: 3px solid rgba(255, 255, 255, 0.2); /* debug visual */
       border-radius: 10px;
+      pointer-events: none;
+      user-select: none;
     }
     img.show {
       opacity: 1;
@@ -27,33 +28,34 @@
   </style>
 </head>
 <body>
-  <img id="meme" src="" alt="meme">
+  <img id="meme" src="" alt="meme" />
+  <script src="config.js"></script>
   <script>
-    const img = document.getElementById('meme');
-    const socket = new WebSocket("ws://127.0.0.1:8000/ws");
+    const { SERVER_IP, SERVER_PORT } = window.POSEEDIT_CONFIG;
+    const WS_URL = `ws://${SERVER_IP}:${SERVER_PORT}/ws`;
+    const HTTP_URL = `http://${SERVER_IP}:${SERVER_PORT}/`;
 
-    socket.onopen = () => console.log("🟢 Conectado ao servidor WebSocket");
-    socket.onmessage = event => {
+    const img = document.getElementById("meme");
+    const socket = new WebSocket(WS_URL);
+
+    socket.onopen = () => console.log(`🟢 Conectado a ${WS_URL}`);
+
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("📩 Evento recebido:", data);
 
-      const memeUrl = `http://127.0.0.1:8000/${data.meme}?t=${Date.now()}`;
-      img.classList.remove("show"); // oculta imagem anterior
+      const memeUrl = `${HTTP_URL}${data.meme}?t=${Date.now()}`;
+      img.classList.remove("show");
       img.src = memeUrl;
 
       img.onload = () => {
-        img.classList.add("show"); // mostra com fade-in
+        img.classList.add("show");
         console.log("✅ Imagem carregada:", memeUrl);
-
-        // some após 3 segundos
-        setTimeout(() => {
-          img.classList.remove("show");
-          console.log("🕒 Imagem oculta após 3s");
-        }, 3000);
+        setTimeout(() => img.classList.remove("show"), 3000);
       };
     };
 
-    socket.onerror = err => console.error("⚠️ Erro no WebSocket:", err);
+    socket.onerror = (err) => console.error("⚠️ Erro no WebSocket:", err);
     socket.onclose = () => console.log("🔴 Conexão encerrada");
   </script>
 </body>
