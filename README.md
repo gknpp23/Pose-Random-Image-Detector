@@ -1,92 +1,175 @@
-# Nu Metal Pose: Random Image Detector
+# Posedit Random Image Detector  
 
-> A real-time computer vision project that detects a specific hand gesture (the "Nu Metal Pose") and displays a random image on screen.
+> Sistema em tempo real que reconhece poses, gestos e expressões faciais e exibe memes aleatórios via WebSocket e overlay web.
 
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
-This is an open-source Python project that uses your webcam to perform real-time gesture detection. When the application identifies two open hands on screen simultaneously, it triggers an event and overlays a random image from a local folder onto the video feed.
-
-*(Feel free to add a GIF or screenshot of your project working here!)*
-
-## ✨ Features
-
-* **Real-Time Hand Tracking:** Utilizes MediaPipe to track 21 keypoints on multiple hands.
-* **Gesture Recognition:** Implements custom logic to determine if a hand is "open" or "closed".
-* **"Nu Metal Pose" Trigger:** Specifically detects when **two** hands are simultaneously in the "open" state.
-* **Random Image Overlay:** When the pose is triggered, the app randomly selects one of your custom images and displays it.
-* **Transparency Support:** Correctly overlays PNG images with alpha channels (transparency).
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-Hands-orange)
+![OpenCV](https://img.shields.io/badge/OpenCV-vision-lightblue)
 
 ---
 
-## 🛠️ How It Was Made (Technology)
+## 🧩 Sobre o Projeto  
 
-This project was built entirely in Python using two core computer vision libraries:
+O **Poseedit** é um sistema de detecção de gestos construído em **Python**, capaz de identificar quando o usuário realiza poses específicas.  
+Quando o gesto é reconhecido, o sistema envia um **evento via WebSocket** para um **servidor FastAPI**, que aciona um **overlay web** — exibindo uma imagem aleatória (meme) na tela em tempo real.
 
-* **[OpenCV](https://opencv.org/):** Used for capturing the webcam video feed, basic image processing (like flipping the video for a "selfie" mode), color space conversion (BGR to RGB), and overlaying the final images and text onto the screen.
-* **[MediaPipe](https://developers.google.com/mediapipe) (by Google):** This is the "magic" behind the gesture recognition. We use the `MediaPipe Hands` solution, which provides a high-fidelity, 21-point 3D landmark model for each hand it detects in the frame.
-
----
-
-## 💡 The Logic
-
-1.  **Capture Frame:** The script reads a new frame from the webcam using `cv2.VideoCapture()`.
-2.  **Process Frame:** The frame is sent to the `MediaPipe Hands` model for processing.
-3.  **Find Hands:** The model returns the landmark (keypoint) data for up to two hands.
-4.  **Check Gesture:** For each detected hand, a custom function `is_hand_open()` runs. This function checks the **Y-coordinates** of the fingertips (like the index finger tip, landmark #8) against their middle joints (index finger joint, landmark #6).
-    * If `tip.y < joint.y` (meaning the tip is *higher* on the screen), the finger is considered "open".
-    * If 4 or 5 fingers are "open", the hand is classified as open.
-5.  **Trigger Event:** If the code counts `open_hands_count == 2`, it sets a "pose detected" flag.
-6.  **Pick Random Image:** A state-locking mechanism (`pose_detected_previously`) ensures that a new random image is chosen from your folder *only on the first frame* the pose is detected (this prevents the image from flickering randomly).
-7.  **Overlay Image:** The chosen image is "pasted" onto the main video frame using `cv2` (OpenCV), correctly handling transparency.
-8.  **Display:** The final, modified frame is shown to the user.
+A arquitetura foi projetada para demonstrar comunicação **assíncrona entre Python e Web**, integrando visão computacional, backend e interface interativa.
 
 ---
 
-## 🚀 How to Run
+## ✨ Funcionalidades  
 
-### 1. Prerequisites
-
-You must have Python 3.x installed on your machine.
-
-### 2. Installation
-
-1.  **Clone this repository:**
-    ```bash
-    git clone [https://github.com/](https://github.com/)/GabrielaMarculino/Nu-Metal-Pose-Random-Image-Detector.git
-    cd [Nome da Pasta]
-    ```
-
-2.  **Install the required libraries:**
-    ```bash
-    pip install opencv-python mediapipe
-    ```
-
-### 3. Usage
-
-1.  **Add Your Images:**
-    * Find 5 images (or more!) that you want to display.
-    * Place them in the same root folder as the Python script.
-    * Update the `IMAGE_FILENAMES` list in the Python script (`main.py`) with the exact names of your files:
-    
-    ```python
-    IMAGE_FILENAMES = [
-        'my_image_1.png',  
-        'my_image_2.jpg',  
-        # etc...
-    ]
-    ```
-
-2.  **Run the script:**
-    ```bash
-    python main.py
-    ```
-    *(Change `main.py` to whatever you named your file.)*
-
-3.  **Make the Pose!**
-    * Show both of your hands, open, to the camera to trigger the random image.
+✅ **Detecção em tempo real de mãos** com MediaPipe  
+✅ **Identificação da pose “duas mãos abertas”**  
+✅ **Envio de eventos assíncronos via WebSocket**  
+✅ **Servidor FastAPI** responsável por retransmitir os eventos  
+✅ **Overlay HTML interativo** que exibe imagens (memes) recebidas  
+✅ **Sistema de reconexão automática e tratamento de erros** no cliente Python  
+✅ **Arquitetura modular** (detector / servidor / overlay)  
 
 ---
 
-## 📄 License
+## ⚙️ Estrutura do Projeto  
 
-This project is open source and distributed under the **MIT License**. This means you are free to use, modify, and distribute this code for any purpose. See the `LICENSE` file for more details.
+```bash
+Pose-Random-Image-Detector/
+├── backend/
+│   └── server.py          # Servidor FastAPI + WebSocket
+│
+├── detector/
+│   └── detector.py        # Cliente de detecção e envio de eventos
+│
+├── overlay/
+│   └── index.html         # Interface que exibe as imagens em tempo real
+│
+├── images/
+│   ├── calma.jpg
+│   ├── davi.jpg
+│   └── ...                # Outras imagens utilizadas no overlay
+│
+├── requirements.txt       # Dependências do projeto
+└── README.md              # Este arquivo 😄
+````
+
+---
+
+## 🧠 Tecnologias Utilizadas
+
+* **Python 3.12+**
+* **[FastAPI](https://fastapi.tiangolo.com/)** → Servidor WebSocket backend
+* **[MediaPipe Hands](https://developers.google.com/mediapipe)** → Detecção dos pontos da mão
+* **[OpenCV](https://opencv.org/)** → Processamento e captura de vídeo
+* **WebSockets (asyncio)** → Comunicação em tempo real entre Python ↔ Front-end
+* **HTML + JavaScript** → Overlay leve e reativo para exibir os memes
+
+---
+
+## Como Executar
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/gknpp23/Pose-Random-Image-Detector.git
+cd Pose-Random-Image-Detector
+```
+
+### 2. Criar e ativar o ambiente virtual
+
+```bash
+python -m venv venv
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
+```
+
+### 3. Instalar as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Executar o servidor
+
+```bash
+python backend/server.py
+```
+
+> O servidor ficará disponível em:
+> 📍 `http://127.0.0.1:8000`
+> 📡 WebSocket ativo em `ws://127.0.0.1:8000/ws`
+
+### 5. Iniciar o detector
+
+```bash
+python detector/detector.py
+```
+
+> O detector abrirá o vídeo (webcam ou arquivo) e enviará eventos ao servidor quando a pose for detectada.
+
+### 6. Abrir o overlay
+
+Abra no navegador:
+
+```
+http://127.0.0.1:8000/overlay/index.html
+```
+
+> Ao detectar a pose, o overlay exibirá uma imagem aleatória da pasta `/images`.
+
+---
+
+## 🧪 Teste de Conexão
+
+Para verificar se o servidor WebSocket está ativo, você pode rodar:
+
+```bash
+python test_ws.py
+```
+
+Se tudo estiver certo, verá algo como:
+
+```
+✅ Conectou com sucesso ao servidor WebSocket!
+📩 Resposta recebida: {"teste": "ping"}
+```
+
+---
+
+## 🧱 Roadmap Futuro
+
+* [ ] Suporte a múltiplas poses (gestos diferentes)
+* [ ] API REST para upload de novas imagens
+* [ ] Dashboard web para visualização de métricas em tempo real
+* [ ] Deploy em nuvem com Docker + FastAPI
+* [ ] Sistema de pontuação gamificado para interações
+
+---
+
+## 🖼️ Exemplo Visual
+
+### 🔹 Interface Web (Overlay)
+
+O overlay exibe automaticamente um meme quando a pose é detectada.
+*(Exemplo real do projeto em execução)*
+
+![Overlay Example](https://github.com/gknpp23/Pose-Random-Image-Detector/assets/overlay-example.png)
+
+---
+
+## 📜 Licença
+
+Distribuído sob a licença **MIT**.
+Sinta-se livre para usar, modificar e distribuir.
+Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+## 👨‍💻 Autor
+
+**Gabriel Knupp**
+💼 Desenvolvedor & entusiasta de automação e IA
+📍 Minas Gerais — Brasil
+🌐 [github.com/gknpp23](https://github.com/gknpp23)
+
+
