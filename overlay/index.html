@@ -1,62 +1,90 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Overlay PoseEdit</title>
-  <style>
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    img {
-      max-width: 60%;
-      max-height: 80%;
-      opacity: 0;
-      transition: opacity 0.6s ease-in-out;
-      border-radius: 10px;
-      pointer-events: none;
-      user-select: none;
-    }
-    img.show {
-      opacity: 1;
-    }
-  </style>
-</head>
-<body>
-  <img id="meme" src="" alt="meme" />
-  <script src="config.js"></script>
-  <script>
-    const { SERVER_IP, SERVER_PORT } = window.POSEEDIT_CONFIG;
-    const WS_URL = `ws://${SERVER_IP}:${SERVER_PORT}/ws`;
-    const HTTP_URL = `http://${SERVER_IP}:${SERVER_PORT}/`;
+  <head>
+    <meta charset="UTF-8" />
+    <title>Overlay PoseEdit</title>
+    <style>
+      body {
+        margin: 0;
+        background: transparent;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
-    const img = document.getElementById("meme");
-    const socket = new WebSocket(WS_URL);
+      img {
+        max-width: 60%;
+        max-height: 80%;
+        opacity: 0;
+        transition: opacity 0.6s ease-in-out;
+        border-radius: 10px;
+        pointer-events: none;
+        user-select: none;
+      }
 
-    socket.onopen = () => console.log(`🟢 Conectado a ${WS_URL}`);
+      img.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <img id="meme" src="" alt="meme" />
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("📩 Evento recebido:", data);
+    <!-- Configurações externas -->
+    <script src="config.js"></script>
 
-      const memeUrl = `${HTTP_URL}${data.meme}?t=${Date.now()}`;
-      img.classList.remove("show");
-      img.src = memeUrl;
+    <script>
+      const { SERVER_IP, SERVER_PORT } = window.POSEEDIT_CONFIG;
+      const WS_URL = `ws://${SERVER_IP}:${SERVER_PORT}/ws`;
+      const HTTP_URL = `http://${SERVER_IP}:${SERVER_PORT}/`;
+      const DISPLAY_TIME = window.POSEEDIT_CONFIG.DISPLAY_TIME || 3000;
 
-      img.onload = () => {
-        img.classList.add("show");
-        console.log("✅ Imagem carregada:", memeUrl);
-        setTimeout(() => img.classList.remove("show"), 3000);
-      };
-    };
+      const img = document.getElementById("meme");
 
-    socket.onerror = (err) => console.error("⚠️ Erro no WebSocket:", err);
-    socket.onclose = () => console.log("🔴 Conexão encerrada");
-  </script>
-</body>
+      // Função principal de conexão WS
+      function connectWS() {
+        console.log(`⚙️ Tentando conectar a ${WS_URL}...`);
+        const socket = new WebSocket(WS_URL);
+
+        socket.onopen = () => console.log(`🟢 Conectado ao servidor WebSocket: ${WS_URL}`);
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            console.log("📩 Evento recebido:", data);
+
+            const memeUrl = `${HTTP_URL}${data.meme}?t=${Date.now()}`;
+            img.classList.remove("show");
+            img.src = memeUrl;
+
+            img.onload = () => {
+              img.classList.add("show");
+              console.log("✅ Imagem carregada:", memeUrl);
+              setTimeout(() => {
+                img.classList.remove("show");
+                console.log("🕒 Imagem oculta após 3s");
+              }, DISPLAY_TIME);
+            };
+          } catch (err) {
+            console.error("⚠️ Erro ao processar mensagem:", err);
+          }
+        };
+
+        socket.onerror = (err) => {
+          console.error("🚨 Erro no WebSocket:", err);
+        };
+
+        socket.onclose = (evt) => {
+          console.warn("🔴 Conexão encerrada:", evt.reason || "sem motivo");
+          console.log("🔁 Tentando reconectar em 5 segundos...");
+          setTimeout(connectWS, 5000);
+        };
+      }
+
+      // Inicia a conexão
+      connectWS();
+    </script>
+  </body>
 </html>
